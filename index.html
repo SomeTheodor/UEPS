@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora UEPS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora UEPS</h1>
+        <h2>Ingrese Compras</h2>
+        <form id="uepsForm">
+            <div class="form-group">
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" required>
+            </div>
+            <div class="form-group">
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" required>
+            </div>
+            <div class="form-group">
+                <label for="costoUnitario">Costo Unitario:</label>
+                <input type="number" step="0.01" id="costoUnitario" required>
+            </div>
+            <button type="submit">Agregar Entrada</button>
+        </form>
+        <h2>Tabla de entradas</h2>
+        <table id="entriesTable">
+            <tr>
+                <th>Fecha</th>
+                <th>Cantidad</th>
+                <th>Costo Unitario</th>
+                <th>Costo Total</th>
+            </tr>
+        </table>
+        <h2>Ingrese Salidas</h2>
+        <form id="salidaForm">
+            <div class="form-group">
+                <label for="salidaFecha">Fecha de Salida:</label>
+                <input type="date" id="salidaFecha" required>
+            </div>
+            <div class="form-group">
+                <label for="salidaCantidad">Cantidad de Salida:</label>
+                <input type="number" id="salidaCantidad" required>
+            </div>
+            <button type="submit">Registrar Salida</button>
+        </form>
+        <h2>Tabla de salidas</h2>
+        <table id="salidasTable">
+            <tr>
+                <th>Fecha de Salida</th>
+                <th>Cantidad de Salida</th>
+                <th>Costo Total de Salida</th>
+            </tr>
+        </table>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
