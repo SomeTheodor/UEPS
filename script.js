@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('uepsForm');
     const salidaForm = document.getElementById('salidaForm');
-    const entriesTable = document.getElementById('entriesTable');
-    const salidasTable = document.getElementById('salidasTable');
+    const movimientosTable = document.getElementById('movimientosTable');
+    const cantidadTotalDiv = document.getElementById('cantidadTotal');
     const entries = [];
     const salidas = [];
+    let cantidadTotal = 0;
+    let costoTotal = 0;
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -17,11 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const entry = {
                 fecha,
                 cantidad,
-                costoUnitario
+                costoUnitario,
+                costoTotal: cantidad * costoUnitario
             };
 
             entries.push(entry);
-            updateEntriesTable();
+            cantidadTotal += cantidad;
+            costoTotal += entry.costoTotal;
+            updateMovimientosTable(entry, 'Entrada');
+            updateCantidadTotal();
             form.reset();
         } else {
             alert('Por favor, complete todos los campos correctamente.');
@@ -38,8 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const salida = registrarSalida(salidaFecha, salidaCantidad);
             if (salida) {
                 salidas.push(salida);
-                updateEntriesTable();
-                updateSalidasTable();
+                cantidadTotal -= salidaCantidad;
+                costoTotal -= salida.costoTotal;
+                updateMovimientosTable(salida, 'Salida');
+                updateCantidadTotal();
                 salidaForm.reset();
             }
         } else {
@@ -47,42 +55,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function updateEntriesTable() {
-        entriesTable.innerHTML = `
-            <tr>
-                <th>Fecha</th>
-                <th>Cantidad</th>
-                <th>Costo Unitario</th>
-                <th>Costo Total</th>
-            </tr>
-        `;
+    function updateMovimientosTable(movimiento, tipo) {
+        const row = movimientosTable.insertRow();
 
-        entries.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)); // Ordena por fecha (últimas entradas primero)
+        row.insertCell(0).innerText = movimiento.fecha;
+        row.insertCell(1).innerText = tipo;
+        row.insertCell(2).innerText = movimiento.cantidad;
+        row.insertCell(3).innerText = movimiento.costoUnitario.toFixed(2);
+        row.insertCell(4).innerText = movimiento.costoTotal.toFixed(2);
+        
+        // Calculate average unit cost for saldo
+        const saldoCostoUnitario = cantidadTotal ? (costoTotal / cantidadTotal).toFixed(2) : 0;
 
-        entries.forEach(entry => {
-            const row = entriesTable.insertRow();
-            row.insertCell(0).innerText = entry.fecha;
-            row.insertCell(1).innerText = entry.cantidad;
-            row.insertCell(2).innerText = entry.costoUnitario.toFixed(2);
-            row.insertCell(3).innerText = (entry.cantidad * entry.costoUnitario).toFixed(2);
-        });
+        row.insertCell(5).innerText = cantidadTotal;
+        row.insertCell(6).innerText = saldoCostoUnitario;
+        row.insertCell(7).innerText = costoTotal.toFixed(2);
     }
 
     function registrarSalida(salidaFecha, salidaCantidad) {
         let cantidadRestante = salidaCantidad;
         let costoTotalSalida = 0;
 
-        while (cantidadRestante > 0 && entries.length > 0) {
-            const ultimaEntrada = entries[0];
+        for (let i = 0; i < entries.length; i++) {
+            const entrada = entries[i];
 
-            if (ultimaEntrada.cantidad <= cantidadRestante) {
-                costoTotalSalida += ultimaEntrada.cantidad * ultimaEntrada.costoUnitario;
-                cantidadRestante -= ultimaEntrada.cantidad;
-                entries.shift(); // Elimina la última entrada
+            if (entrada.cantidad <= cantidadRestante) {
+                costoTotalSalida += entrada.cantidad * entrada.costoUnitario;
+                cantidadRestante -= entrada.cantidad;
+                entrada.cantidad = 0;
             } else {
-                costoTotalSalida += cantidadRestante * ultimaEntrada.costoUnitario;
-                ultimaEntrada.cantidad -= cantidadRestante;
+                costoTotalSalida += cantidadRestante * entrada.costoUnitario;
+                entrada.cantidad -= cantidadRestante;
                 cantidadRestante = 0;
+                break;
             }
         }
 
@@ -91,27 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         } else {
             return {
-                salidaFecha,
-                salidaCantidad,
-                costoTotalSalida: costoTotalSalida.toFixed(2)
+                fecha: salidaFecha,
+                cantidad: salidaCantidad,
+                costoUnitario: costoTotalSalida / salidaCantidad,
+                costoTotal: costoTotalSalida
             };
         }
     }
 
-    function updateSalidasTable() {
-        salidasTable.innerHTML = `
-            <tr>
-                <th>Fecha de Salida</th>
-                <th>Cantidad de Salida</th>
-                <th>Costo Total de Salida</th>
-            </tr>
-        `;
-
-        salidas.forEach(salida => {
-            const row = salidasTable.insertRow();
-            row.insertCell(0).innerText = salida.salidaFecha;
-            row.insertCell(1).innerText = salida.salidaCantidad;
-            row.insertCell(2).innerText = salida.costoTotalSalida;
-        });
+    function updateCantidadTotal() {
+        cantidadTotalDiv.innerText = cantidadTotal;
     }
 });

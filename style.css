@@ -13,7 +13,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px; /* Aumentar el tamaño del contenedor */
     margin: 30px auto;
     padding: 20px;
     background: #fff;
@@ -40,10 +40,12 @@ form {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
+    width: 100%; /* Asegurar que el formulario use el 100% del ancho del contenedor */
 }
 
 .form-group {
     margin-bottom: 15px;
+    width: 100%; /* Asegurar que el grupo de formulario use el 100% del ancho del contenedor */
 }
 
 label {
@@ -57,7 +59,7 @@ button {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 100%;
+    width: 100%; /* Asegurar que los inputs y el botón usen el 100% del ancho del contenedor */
 }
 
 button {
